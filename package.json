@@ -1,0 +1,59 @@
+{
+  "name": "dsh-qbuddy-prompt-enhance",
+  "version": "0.6.5",
+  "private": true,
+  "type": "module",
+  "description": "QBuddy：输入框一键把草稿改写成更可执行的提示词（四档内置预设 + 任意多个自定义预设 + 模型/思考强度快切）",
+  "license": "MIT",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "prompt",
+    "prompt-engineering",
+    "prompt-enhance"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhdkfkfkf/dsh-qbuddy-prompt-enhance.git"
+  },
+  "homepage": "https://github.com/dhdkfkfkf/dsh-qbuddy-prompt-enhance#readme",
+  "bugs": {
+    "url": "https://github.com/dhdkfkfkf/dsh-qbuddy-prompt-enhance/issues"
+  },
+  "icon": "./icon.svg",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./presets": "./presets.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "presets.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  },
+  "scripts": {
+    "pretest": "node test/link-host-deps.mjs",
+    "test": "node test/clean-output.test.mjs && node test/host-routes.mjs && node test/client-smoke.mjs"
+  }
+}

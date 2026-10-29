@@ -1,0 +1,34 @@
+# dsh bundle layer: QBuddy。
+# Host 半在 loopback web 服务器上注册 /prompt-enhance-v2 前缀路由，
+# 用当前 profile 的模型跑一次独立补全；Client 半在输入框右侧工具条
+# （slot conversation.input.right）加一个 split button：右段菜单切四档内置
+# 预设 + 自己建的任意多个自定义预设，再往下是模型与思考强度快速切换。
+# 自定义预设与 provider / model / 超时都在插件详情页里配置。
+#
+# 与旧插件 dsh-plugin-prompt-enhance 的入口 id / 路由前缀 / 插槽 id 全部错开，
+# 允许两份同时安装对比（卸载旧插件在后续票里做）。
+- insert:
+    - id: prompt-enhance-v2
+      name: dsh-qbuddy-prompt-enhance
+      config:
+        # 关闭后 enhance 路由一律 409，输入框按钮不再发请求。
+        enabled: true
+        # 四档内置 id，加上详情页里建的自定义预设 id（custom-*）。
+        # 菜单切换时由 configEditor 改写这一项；与默认值相同时不落盘。
+        # Config 里这一项是 volatile：Loader 就地提交，不重启插件。
+        preset: qbuddy
+        # 自定义预设列表，在详情页里增删改，想建几个建几个。
+        # 每项 = { id, name, system, user }，user 必须含 {{draft}}。
+        customPresets: []
+        # 0.5.x 的单档字段：只用于迁移，保存过自定义预设后会被清空。
+        customName: ''
+        customSystem: ''
+        customUser: ''
+        # provider/model 留空 = 跟随 profile 的默认模型（agentDefaultModel）。
+        provider: ''
+        model: ''
+        # 思考强度：空串 = 用模型自己的默认档；非空时随请求发给适配器。
+        # 详情页选完模型后，候选来自 GET /prompt-enhance-v2/model-info。
+        reasoningEffort: ''
+        # 单次增强的超时；到点 abort，不会一直占着按钮。
+        timeoutMs: 30000

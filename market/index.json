@@ -1,0 +1,35 @@
+{
+  "format": 1,
+  "title": { "en": "QBuddy", "zh": "QBuddy" },
+  "description": {
+    "en": "Plugins by dhdkfkfkf",
+    "zh": "dhdkfkfkf 的 DSH 插件"
+  },
+  "plugins": [
+    {
+      "name": "dsh-qbuddy-prompt-enhance",
+      "title": { "en": "QBuddy Prompt Enhance", "zh": "QBuddy 提示词增强" },
+      "description": {
+        "en": "One button beside the composer rewrites your draft into a clearer, more executable prompt. Four built-in presets, unlimited custom presets, and on-the-spot switching of preset, prompt model and reasoning effort.",
+        "zh": "输入框旁边一个按钮，把草稿改写成更清晰、更可执行的提示词。四档内置预设、任意多个自定义预设，预设 / 提示词模型 / 思考强度都能在输入框旁边随时切。"
+      },
+      "icon": "icon.svg",
+      "author": "dhdkfkfkf",
+      "homepage": "https://github.com/dhdkfkfkf/dsh-qbuddy-prompt-enhance#readme",
+      "repository": {
+        "url": "https://github.com/dhdkfkfkf/dsh-qbuddy-prompt-enhance"
+      },
+      "versions": [
+        {
+          "version": "0.6.5",
+          "publishTimestamp": 1793240571,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/dhdkfkfkf/dsh-qbuddy-prompt-enhance",
+            "commit": "2a655d1b9f1739ace0597047bf1f7b2c59958632"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -18,7 +18,19 @@
 
 ## 安装
 
-DSH 桌面端从本地包装：
+### 从插件市场装
+
+打开**插件 → 实验性插件旁的更多 → 自定义插件市场**，打开开关后切到**发现**，点**添加索引源**，填入：
+
+```
+https://raw.githubusercontent.com/dhdkfkfkf/dsh-qbuddy-prompt-enhance/main/market/index.json
+```
+
+然后搜索 QBuddy 安装即可。索引文件在 [`market/index.json`](./market/index.json)，从 Git 仓库按 tag 装。
+
+### 从 tgz 装
+
+DSH 桌面端也可以直接装本地包：
 
 1. 拿到 `dsh-qbuddy-prompt-enhance-<版本>.tgz`；
 2. 在 profile 的 `package.json` 里加一条 `file:` 依赖指向它：

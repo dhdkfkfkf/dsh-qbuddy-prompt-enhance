@@ -5,10 +5,11 @@
 # 预设 + 自己建的任意多个自定义预设，再往下是模型与思考强度快速切换。
 # 自定义预设与 provider / model / 超时都在插件详情页里配置。
 #
-# 与旧插件 dsh-plugin-prompt-enhance 的入口 id / 路由前缀 / 插槽 id 全部错开，
-# 允许两份同时安装对比（卸载旧插件在后续票里做）。
+# 入口 id 与包名、客户端模块 id 一致：dsh-qbuddy-prompt-enhance。
+# 0.6.6 之前是 prompt-enhance-v2——从旧版升级时，请先删掉 profile
+# cordis.patch.yml 里 id: prompt-enhance-v2 那一条，否则同一插件会被加载两次。
 - insert:
-    - id: prompt-enhance-v2
+    - id: dsh-qbuddy-prompt-enhance
       name: dsh-qbuddy-prompt-enhance
       config:
         # 关闭后 enhance 路由一律 409，输入框按钮不再发请求。

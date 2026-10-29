@@ -83,7 +83,7 @@ function volatileRef(initial) {
 function mount(config = {}, overrides = {}) {
   routes.length = 0
   const calls = { stream: [], prepare: [], modelInfo: [], defaultSelection: 0, edits: [], entries: 0 }
-  const defaultEntry = { options: { id: 'prompt-enhance-v2' }, config: {} }
+  const defaultEntry = { options: { id: 'dsh-qbuddy-prompt-enhance' }, config: {} }
   // 真实宿主交给 apply 的 config 里运行时字段都是 volatile 引用；这里同样包一层。
   const live = { ...config }
   for (const field of VOLATILE_FIELDS) {
@@ -310,7 +310,7 @@ check(
 )
 eq('简介与注册表逐字一致', initialData.presets[2].description.zh, QBUDDY.description.zh)
 check('内置项不带 custom 标记', initialData.presets.every((preset) => preset.custom === undefined))
-eq('返回 Loader 条目 id', initialData.entryId, 'prompt-enhance-v2')
+eq('返回 Loader 条目 id', initialData.entryId, 'dsh-qbuddy-prompt-enhance')
 eq('有 configEditor 时可以写', initialData.canWrite, true)
 eq('初始 provider 为空', initialData.config.provider, '')
 eq('初始 model 为空', initialData.config.model, '')
@@ -326,7 +326,7 @@ eq('起步模板带默认名称', initialData.customDefaults.name.zh, '自定义
 const switched = await saveSettings(settingsMount.handler, { preset: 'qoder' })
 check('PUT settings 200', switched.status === 200 && switched.json().data.current === 'qoder', switched.payload)
 eq('写了一次配置', settingsMount.calls.edits.length, 1)
-eq('按 Loader 条目 id 找条目', settingsMount.calls.edits[0].entry.options.id, 'prompt-enhance-v2')
+eq('按 Loader 条目 id 找条目', settingsMount.calls.edits[0].entry.options.id, 'dsh-qbuddy-prompt-enhance')
 eq('落盘 patch 只带 preset', JSON.stringify(settingsMount.calls.edits[0].patch), JSON.stringify({ preset: 'qoder' }))
 
 const qoderCall = await enhance(settingsMount.handler, { draft: 'hi' })
@@ -445,7 +445,7 @@ const failingEditor = mount(
   {
     services: {
       configEditor: {
-        entries: () => [{ options: { id: 'prompt-enhance-v2' } }],
+        entries: () => [{ options: { id: 'dsh-qbuddy-prompt-enhance' } }],
         async edit() {
           throw new Error('磁盘只读')
         },

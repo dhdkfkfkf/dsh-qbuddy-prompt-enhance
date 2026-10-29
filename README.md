@@ -18,25 +18,32 @@
 
 ## 安装
 
-### 从 tgz 装
+桌面端的 `desktop` Profile 由应用自己托管，**不能**用 `dsh plugin add` 装，会报
+`profile "desktop" is managed exclusively by the Electron application`。
 
-DSH 桌面端也可以直接装本地包：
+### 桌面版（Desktop）
 
-1. 拿到 `dsh-qbuddy-prompt-enhance-<版本>.tgz`；
-2. 在 profile 的 `package.json` 里加一条 `file:` 依赖指向它：
+1. **界面安装（推荐）**：设置 → 插件 → 安装，选下载好的 `.tgz` 或填包名，启用后**完全退出并重开 DSH**（连托盘图标一起退）。
+2. **AI 会话安装**：在支持 `plugin_manager` 的会话里执行 `install_bundle`，`target` 传**包目录的绝对路径**（解包后含 `package.json` 的那一层；直接传 `.tgz` 路径不行）。
+3. **本地目录链接（改代码用）**：插件页选本地源码目录，会以 `link:` 链进 profile，改完重启 DSH 生效。
 
-   ```json
-   {
-     "dependencies": {
-       "dsh-qbuddy-prompt-enhance": "file:<绝对路径>/dsh-qbuddy-prompt-enhance-0.6.5.tgz"
-     }
-   }
-   ```
+### Web 版 / 命令行（CLI）
 
-3. 在 profile 目录跑一次 `pnpm install`；
-4. 刷新页面。
+Web 版不受 Electron 托管，`dsh plugin` 会把参数转给 profile 目录里的 pnpm：
 
-也可以直接解包到 `<profile>/node_modules/dsh-qbuddy-prompt-enhance/`，效果一样。插件入口 id 是 `prompt-enhance-v2`，开关在 profile 的 `cordis.patch.yml` 里。
+| 来源 | 命令 | 说明 |
+|---|---|---|
+| npm 包 | `dsh plugin --profile web add <包名>` | 需要已发布到 npm（本插件暂未发布） |
+| 本地 tgz | `dsh plugin --profile web add file:/绝对路径/包.tgz` | 离线分发 |
+| 本地目录 | `dsh plugin --profile web add ./插件目录` | `link:` 链入，改代码即生效 |
+| GitHub 源码 | `dsh plugin --profile web add github:dhdkfkfkf/dsh-qbuddy-prompt-enhance` | 直接拉仓库源码 |
+
+> 从 GitHub 装源码时，若包里有需要编译的 TS，pnpm 默认会拦 `prepare` 脚本，需要按报错提示在 profile 的 `pnpm-workspace.yaml` 里加 `allowBuilds` 授权后重试。本插件是纯 JS、没有构建步骤，一般碰不到。
+
+### 升级须知（0.6.6 起）
+
+Loader 入口 id 从 `prompt-enhance-v2` 改成 `dsh-qbuddy-prompt-enhance`，与包名、客户端模块 id 对齐。
+从旧版升级时，先删掉 profile `cordis.patch.yml` 里 `id: prompt-enhance-v2` 那一条，否则同一插件会被加载两次。
 
 ## 用法
 
@@ -44,7 +51,7 @@ DSH 桌面端也可以直接装本地包：
 
 按钮**只在输入框有内容时出现**：空草稿（含只有空白）时整个按钮不渲染，一打字就出现，草稿清空后又隐藏。它不占位，输入框本身的布局不受影响。
 
-- **左段**：按一下开始增强。运行中显示已用秒数（满 1 秒才出现，超过 25 秒转警告色），此时再按一下是取消。
+- **左段**：按一下开始增强。运行中显示已用秒数（满 1 秒才出现，到**超时预算的 80%** 转警告色——默认 30 秒即第 24 秒；超时改成 600 秒，就是第 480 秒），此时再按一下是取消。
 - **右段**：打开菜单，预设 / 提示词模型 / 思考强度都在这里切。
 - 结果回来时：
   - 草稿没变 → 直接写回，左段回到空闲；
@@ -102,7 +109,7 @@ DSH 桌面端也可以直接装本地包：
 
 ## 配置项
 
-`cordis.patch.yml` 的入口 id 是 `prompt-enhance-v2`：
+`cordis.patch.yml` 的入口 id 是 `dsh-qbuddy-prompt-enhance`：
 
 | 键 | 默认 | 说明 |
 |---|---|---|
@@ -123,7 +130,9 @@ DSH 桌面端也可以直接装本地包：
 
 **为什么界面先落地、配置后台写。** `configEditor.edit` 每次写入要在服务端跑两遍 `reconcileProfilePatches`，真实换档耗时在秒级，界面等不起。所以切档是乐观更新：先换文案、关菜单，PUT 在后台串行排队，失败才回滚并以宿主为准重拉。同一帧连点也只发一个请求。
 
-**为什么不设 `maxTokens`。** 曾按草稿长度推算输出预算，结果短草稿每次都空返回——当前默认模型是推理模型，reasoning token 也算在 `max_tokens` 里，预算被推理吃光、正文 0 字符。现在把输出预算交给适配器默认值，超时仍然是 30 秒，不会无限等。
+**为什么不设 `maxTokens`。** 曾按草稿长度推算输出预算，结果短草稿每次都空返回——当前默认模型是推理模型，reasoning token 也算在 `max_tokens` 里，预算被推理吃光、正文 0 字符。现在把输出预算交给适配器默认值。兜底的是超时，不是 `max_tokens`：默认 30 秒，配置页可改 0.1–600 秒，到点 abort，不会无限等。
+
+**为什么警告色跟着超时走。** 警告色表示「快到点了」，就该由超时预算算，不能写死。0.6.5 之前写死 25 秒：把超时调到 600 秒，按钮从第 25 秒起就一直黄着，黄到最后毫无信息量；把超时调到 10 秒，黄色又永远不出现。现在取预算的 80%（下限 1 秒）。
 
 **为什么菜单不碰会话模型。** 配置页和菜单写的是同一份插件配置，只影响增强那一次独立调用。会话正在用哪个模型，是另一个状态，插件不该有第二个可写入口。
 
@@ -162,9 +171,9 @@ npm test
 
 - `test/clean-output.test.mjs` —— 输出清洗边界、四档注册表、自定义 id 约定、模板渲染。
 - `test/host-routes.mjs` —— 路由挂载、同源校验、参数校验、截断、清洗、超时、失败映射、配置读写与落盘、预设增删改、模型候选与思考强度。
-- `test/client-smoke.mjs` —— 最小 React 垫片驱动两个插槽，覆盖按钮状态机、并发保护、计时与取消、菜单、配置卡片、下拉降级。
+- `test/client-smoke.mjs` —— 最小 React 垫片驱动两个插槽，覆盖按钮状态机、并发保护、计时与取消（含警告色跟随超时预算）、菜单、配置卡片、下拉降级。
 
-当前共 699 项，全部通过。
+当前共 702 项，全部通过。
 
 `index.js` 依赖宿主提供的 `@deepseek-ai/schemastery`；`pretest` 会从本机 DSH profile 把它链进 `node_modules`，找不到时用 `DSH_SCHEMASTER_DIR` 指定。
 

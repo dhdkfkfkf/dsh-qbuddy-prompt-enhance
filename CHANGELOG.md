@@ -1,5 +1,11 @@
 # 更新日志
 
+## 0.6.6
+
+- 运行中按钮的警告色改为跟随配置里的超时预算（80%，下限 1 秒），不再写死 25 秒。此前把超时调到 600 秒，按钮从第 25 秒起就一直黄着；调到 10 秒，黄色又永不出现。
+- Loader 入口 id 从 `prompt-enhance-v2` 改成 `dsh-qbuddy-prompt-enhance`，与包名、客户端模块 id 一致。从旧版升级需先删掉 profile `cordis.patch.yml` 里旧 id 那一条。
+- README 的安装段重写：删掉手改 `package.json` 那套，改成桌面端界面安装 / `plugin_manager` / 本地目录链接，以及 Web 版与 CLI 的 `dsh plugin --profile web add` 四种来源。
+
 ## 0.6.5
 
 - 菜单里补回思考强度：选一个报了强度的模型后，菜单停在该模型的强度面板；选完即写 `reasoningEffort`。配置页与菜单现在能力一致。

@@ -1,6 +1,6 @@
 {
   "name": "dsh-qbuddy-prompt-enhance",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "private": true,
   "type": "module",
   "description": "QBuddy：输入框一键把草稿改写成更可执行的提示词（四档内置预设 + 任意多个自定义预设 + 模型/思考强度快切）",

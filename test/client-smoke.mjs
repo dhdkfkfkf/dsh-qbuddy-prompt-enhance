@@ -177,7 +177,7 @@ function settingsData(overrides = {}) {
     current: 'qbuddy',
     presets: builtinPresets(),
     canWrite: true,
-    entryId: 'prompt-enhance-v2',
+    entryId: 'dsh-qbuddy-prompt-enhance',
     config: { provider: '', model: '', timeoutMs: 30000 },
     customPresets: [],
     customDefaults: {
@@ -1267,11 +1267,11 @@ await waitTick()
 tree = render()
 eq('满 1 秒显示秒数', textOfNode(labelOf(tree)), '1s')
 eq('计时数字不会把按钮压窄', labelWidth(tree), '48px')
-eq('未到 25 秒不是警告色', mainButton(tree).props['data-overdue'], 'false')
+eq('未到预算的 80% 不是警告色', mainButton(tree).props['data-overdue'], 'false')
 fakeNow += 24_000
 await waitTick()
 tree = render()
-eq('超过 25 秒转警告色', mainButton(tree).props['data-overdue'], 'true')
+eq('超过预算的 80% 转警告色', mainButton(tree).props['data-overdue'], 'true')
 eq('警告态仍在计时', textOfNode(labelOf(tree)), '25s')
 const enhanceCall = fetchCalls.find((call) => call.url === ENHANCE_ROUTE)
 check('请求带 abort signal', Boolean(enhanceCall && enhanceCall.init.signal))
@@ -1286,6 +1286,26 @@ tree = render()
 eq('取消后草稿不动', store.draft, '计时测试')
 eq('取消不写回', calls.setDraft.length, 0)
 eq('取消只发过一次请求', enhanceCalls.length, 1)
+
+/* 警告色跟随配置里的超时，而不是写死 25 秒 */
+console.log('警告色跟随超时配置')
+store.draft = '长超时测试'
+store.draftRev = 61
+tree = await mountReady(async () =>
+  settingsResponse(settingsData({ config: { provider: '', model: '', timeoutMs: 600_000 } })),
+)
+enhanceImpl = () => new Promise(() => {})
+mainButton(tree).props.onClick()
+tree = render()
+fakeNow += 30_000
+await waitTick()
+tree = render()
+eq('超时 600 秒时 30 秒还不是警告色', mainButton(tree).props['data-overdue'], 'false')
+fakeNow += 450_000
+await waitTick()
+tree = render()
+eq('到预算 80% 才转警告色', mainButton(tree).props['data-overdue'], 'true')
+eq('长超时下仍在计时', textOfNode(labelOf(tree)), '480s')
 Date.now = realDateNow
 
 /* ---------------- 失败后重发 ---------------- */

@@ -860,7 +860,14 @@ window.__ModuleLoader__.load({
 
       const seconds = Math.floor(elapsedMs / 1000)
       const showSeconds = busy && elapsedMs >= 1000
-      const overdue = busy && elapsedMs >= 25_000
+      // 警告色跟随配置里的超时预算，取 80%（最少 1 秒），不写死 25 秒：
+      // 超时可配到 600 秒，写死会让「快超时」和「刚开始」长得一样。
+      const budgetMs =
+        settings !== null && settings.config && Number.isFinite(settings.config.timeoutMs)
+          ? settings.config.timeoutMs
+          : 30_000
+      const warnAtMs = Math.max(1000, Math.round(budgetMs * 0.8))
+      const overdue = busy && elapsedMs >= warnAtMs
       const elapsedLabel = showSeconds ? textOf(t, 'button.elapsed').replace('{n}', String(seconds)) : ''
       const presetItems = settings === null ? [] : settings.presets
       const mainLabel =

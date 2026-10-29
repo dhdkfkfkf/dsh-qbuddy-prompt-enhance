@@ -45,8 +45,8 @@ const ROUTE_PROVIDERS = ROUTE_PREFIX + '/providers'
 const ROUTE_MODELS = ROUTE_PREFIX + '/models'
 const ROUTE_MODEL_INFO = ROUTE_PREFIX + '/model-info'
 const ROUTE_NAME = 'prompt-enhance-v2'
-/** cordis.patch.yml 里的 Loader 条目 id：写配置时按它找条目。 */
-const ENTRY_ID = 'prompt-enhance-v2'
+/** cordis.patch.yml 里的 Loader 条目 id：写配置时按它找条目。与包名、客户端模块 id 一致。 */
+const ENTRY_ID = 'dsh-qbuddy-prompt-enhance'
 
 const MAX_BODY_BYTES = 256 * 1024
 const MAX_DRAFT_CHARS = 8000
